@@ -44,6 +44,22 @@
     },
   ];
   const commercePages = new Set(["cart", "checkout", "orders", "confirmation"]);
+  const orderStatuses = [
+    "Pending",
+    "Order Confirmed",
+    "Successfully Prepared",
+    "Out for Delivery",
+    "Delivered",
+    "Cancelled",
+  ];
+  const normalizeOrderStatus = (status) => {
+    const legacy = {
+      Confirmed: "Order Confirmed",
+      Preparing: "Successfully Prepared",
+      "Out for delivery": "Out for Delivery",
+    };
+    return legacy[status] || (orderStatuses.includes(status) ? status : "Pending");
+  };
   const currency = (value) => `₹${value.toLocaleString("en-IN")}`;
   const userKey = () => state.user?.email || "guest";
   const cartKey = () => `dd-cart-${userKey()}`;
@@ -210,10 +226,12 @@
   function renderOrders() {
     heading("MY ORDERS", "Every order, in one place.");
     const orders = getOrders().filter(
-      (order) => order.customer.email === userKey(),
+      (order) =>
+        order.customer.email.trim().toLowerCase() ===
+        userKey().trim().toLowerCase(),
     );
     document.querySelector("#pageContent").innerHTML = orders.length
-      ? `<section class="panel"><div class="panel-head"><h2>Order history</h2><span class="status">${orders.length} ORDERS</span></div>${orders.map((order) => `<article class="order-card"><span class="status">${order.status.toUpperCase()}</span><h3>${order.id}</h3><p>${order.date} · ${order.items.map((item) => `${item.name} × ${item.quantity}`).join(", ")}</p><p>${addressText(order.address)} · <b>${currency(order.total)}</b></p></article>`).join("")}</section>`
+      ? `<section class="panel"><div class="panel-head"><h2>Order history</h2><span class="status">${orders.length} ORDERS</span></div>${orders.map((order) => `<article class="order-card"><span class="status">${normalizeOrderStatus(order.status).toUpperCase()}</span><h3>${order.id}</h3><p>${order.date} · ${order.items.map((item) => `${item.name} × ${item.quantity}`).join(", ")}</p><p>${addressText(order.address)} · <b>${currency(order.total)}</b></p></article>`).join("")}</section>`
       : `<section class="panel empty-state"><h2>No orders yet.</h2><p>Your one-time meal orders will show up here.</p><button class="button" data-commerce-page="menu">Explore meals <span>→</span></button></section>`;
   }
 
@@ -230,14 +248,19 @@
   }
 
   function renderAdminOrders() {
-    if (!state.user || state.user.role !== "Admin" || state.page !== "admin")
+    if (
+      !state.user ||
+      state.user.role?.toLowerCase() !== "admin" ||
+      state.page !== "admin"
+    )
       return;
     const container = document.querySelector("#pageContent .panel");
-    if (!container || container.querySelector(".admin-orders")) return;
+    if (!container) return;
+    container.querySelector(".admin-orders")?.remove();
     const orders = getOrders();
     container.insertAdjacentHTML(
       "beforeend",
-      `<section class="admin-orders"><h2>Orders</h2>${orders.length ? `<table class="users-table"><thead><tr><th>ORDER</th><th>CUSTOMER</th><th>MEALS</th><th>TOTAL</th><th>STATUS</th></tr></thead><tbody>${orders.map((order) => `<tr><td>${order.id}<br><small>${order.date}</small></td><td>${order.customer.name}<br><small>${order.customer.email}</small><br><small>${addressText(order.address)}</small></td><td>${order.items.map((item) => `${item.name} × ${item.quantity}`).join("<br>")}</td><td>${currency(order.total)}</td><td><select class="order-status-select" data-order-id="${order.id}">${["Pending", "Confirmed", "Preparing", "Out for delivery", "Delivered", "Cancelled"].map((status) => `<option ${order.status === status ? "selected" : ""}>${status}</option>`).join("")}</select></td></tr>`).join("")}</tbody></table>` : `<p class="plan-copy">No orders have been placed yet.</p>`}</section>`,
+      `<section class="admin-orders"><div class="panel-head"><div><h2>Orders</h2><p class="plan-copy">Review customer orders and update fulfillment status.</p></div><span class="status">${orders.length} ORDERS</span></div>${orders.length ? `<div class="orders-table-wrap"><table class="users-table"><thead><tr><th>ORDER</th><th>CUSTOMER</th><th>ITEMS</th><th>ADDRESS</th><th>TOTAL</th><th>STATUS</th></tr></thead><tbody>${orders.map((order) => { const status = normalizeOrderStatus(order.status); return `<tr><td><b>${order.id}</b><br><small>${order.date}</small></td><td><b>${order.customer.name}</b><br><small>${order.customer.email}</small></td><td>${order.items.map((item) => `${item.name} × ${item.quantity}`).join("<br>")}</td><td><small>${addressText(order.address)}</small></td><td><b>${currency(order.total)}</b></td><td><select class="order-status-select" data-order-id="${order.id}" aria-label="Status for ${order.id}">${orderStatuses.map((option) => `<option ${status === option ? "selected" : ""}>${option}</option>`).join("")}</select></td></tr>`; }).join("")}</tbody></table></div>` : `<p class="plan-copy">No orders have been placed yet.</p>`}</section>`,
     );
   }
 
@@ -310,7 +333,7 @@
       address: selected,
       payment,
       total: price.total,
-      status: "Confirmed",
+      status: "Pending",
     };
     saveOrders([order, ...getOrders()]);
     saveCart([]);
@@ -321,12 +344,21 @@
   }
 
   function updateOrderStatus(id, status) {
+    if (state.user?.role?.toLowerCase() !== "admin") {
+      notify("Admin access is required to update order status.");
+      return;
+    }
+    if (!orderStatuses.includes(status)) {
+      notify("That order status is not valid.");
+      return;
+    }
     const orders = getOrders();
     const order = orders.find((item) => item.id === id);
     if (!order) return;
     order.status = status;
     saveOrders(orders);
     notify(`Order ${id} marked ${status}.`);
+    renderAdminOrders();
   }
 
   const previousRender = window.render;

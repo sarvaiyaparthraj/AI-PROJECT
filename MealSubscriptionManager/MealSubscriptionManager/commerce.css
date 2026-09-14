@@ -170,11 +170,57 @@
   float: right;
 }
 .order-status-select {
+  width: 100%;
+  min-width: 170px;
   padding: 7px;
   border: 1px solid var(--line);
   border-radius: 3px;
   background: white;
   font: 12px "DM Sans";
+}
+.admin-orders {
+  margin-top: 28px;
+}
+.admin-users {
+  margin-bottom: 22px;
+}
+.admin-users .manage-form {
+  margin: 22px 0;
+  padding: 18px;
+  background: #f7f8f3;
+  border-radius: 5px;
+}
+.admin-users .manage-form h3 {
+  margin: 0 0 14px;
+}
+.admin-users .users-table-wrap {
+  overflow-x: auto;
+}
+.admin-users .users-table {
+  min-width: 900px;
+}
+.admin-users .users-table input,
+.admin-users .users-table select {
+  width: 100%;
+  min-width: 120px;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: white;
+  font: 12px "DM Sans";
+}
+.admin-users .users-table td {
+  vertical-align: middle;
+}
+.orders-table-wrap {
+  overflow-x: auto;
+}
+.admin-orders .users-table {
+  min-width: 900px;
+}
+.admin-orders .users-table td {
+  vertical-align: top;
+  line-height: 1.45;
 }
 .confirmation-icon {
   display: grid;

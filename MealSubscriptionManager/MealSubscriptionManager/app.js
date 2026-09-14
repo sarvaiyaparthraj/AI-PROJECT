@@ -2,7 +2,12 @@ const state = {
   user: null,
   users: JSON.parse(localStorage.getItem("dd-users") || "[]").filter(
     (user) => user.password !== "password",
-  ),
+  ).map((user) => ({
+    ...user,
+    role: user.role?.toLowerCase() === "admin" ? "admin" : "member",
+    accountStatus: user.accountStatus || "Active",
+    registrationDate: user.registrationDate || new Date().toISOString(),
+  })),
   page: "dashboard",
 };
 localStorage.setItem("dd-users", JSON.stringify(state.users));
@@ -88,9 +93,12 @@ function render() {
   if (page === "account")
     content = `<section class="panel manage-form"><h2>Subscription</h2><p class="plan-copy">Everyday plan · 4 meals per week · $39.60</p><button class="outline-button">Pause subscription</button><hr><h2 id="deliveryAddressSection">Delivery address</h2><p class="plan-copy">24 Cedar Lane<br>Brooklyn, NY 11201</p><button class="text-link">Edit details →</button></section>`;
   if (page === "admin")
-    content = `<section class="panel"><h2>Create member</h2><form id="createUser" class="manage-form"><label>Name<input name="name" required placeholder="Full name"></label><label>Email<input type="email" name="email" required placeholder="member@email.com"></label><input type="hidden" name="role" value="Member"><button class="button">Create user <span>→</span></button></form><h2>Members</h2><table class="users-table"><thead><tr><th>NAME</th><th>EMAIL</th><th>ROLE</th></tr></thead><tbody>${state.users.map((u) => `<tr><td>${u.name}</td><td>${u.email}</td><td>${u.role || "Member"}</td></tr>`).join("")}</tbody></table></section>`;
+    content = `<section class="panel admin-users"><div class="panel-head"><div><h2>Users</h2><p class="plan-copy">View and manage registered accounts. Passwords are never displayed.</p></div><span class="status">${state.users.length} USERS</span></div><form id="createUser" class="manage-form"><h3>Create member</h3><label>Name<input name="name" required placeholder="Full name"></label><label>Email<input type="email" name="email" required placeholder="member@email.com"></label><label>Password<input type="password" name="password" minlength="6" required placeholder="At least 6 characters"></label><input type="hidden" name="role" value="member"><button class="button">Create user <span>→</span></button></form><div class="users-table-wrap"><table class="users-table"><thead><tr><th>NAME</th><th>EMAIL</th><th>ROLE</th><th>ACCOUNT STATUS</th><th>REGISTERED</th><th>ACTION</th></tr></thead><tbody>${state.users.map((user, index) => `<tr><td><input form="updateUser-${index}" name="name" value="${user.name}" required></td><td><input form="updateUser-${index}" name="email" type="email" value="${user.email}" required></td><td><select form="updateUser-${index}" name="role"><option value="member" ${user.role === "member" ? "selected" : ""}>member</option><option value="admin" ${user.role === "admin" ? "selected" : ""}>admin</option></select></td><td><select form="updateUser-${index}" name="accountStatus"><option ${user.accountStatus === "Active" ? "selected" : ""}>Active</option><option ${user.accountStatus === "Suspended" ? "selected" : ""}>Suspended</option></select></td><td>${new Date(user.registrationDate).toLocaleDateString()}</td><td><form id="updateUser-${index}" data-user-index="${index}"></form><button class="button small" form="updateUser-${index}" type="submit">Save</button></td></tr>`).join("")}</tbody></table></div></section>`;
   $("#pageContent").innerHTML = content;
   $("#createUser")?.addEventListener("submit", createUser);
+  document.querySelectorAll("[data-user-index]").forEach((form) =>
+    form.addEventListener("submit", updateUser),
+  );
 }
 function createUser(e) {
   e.preventDefault();
@@ -99,10 +107,55 @@ function createUser(e) {
     return;
   }
   const data = Object.fromEntries(new FormData(e.target));
-  const user = { ...data, role: "member" };
+  if (state.users.some((user) => normalizeEmail(user.email) === normalizeEmail(data.email))) {
+    toast("An account with that email already exists.");
+    return;
+  }
+  const user = {
+    ...data,
+    role: "member",
+    accountStatus: "Active",
+    registrationDate: new Date().toISOString(),
+  };
   state.users.push(user);
   localStorage.setItem("dd-users", JSON.stringify(state.users));
   toast(`${data.name} was added.`);
+  render();
+}
+function updateUser(e) {
+  e.preventDefault();
+  if (!isAdmin()) {
+    toast("Admin access is restricted.");
+    return;
+  }
+  const index = Number(e.currentTarget.dataset.userIndex);
+  const data = Object.fromEntries(new FormData(e.currentTarget));
+  const duplicate = state.users.some(
+    (user, userIndex) =>
+      userIndex !== index &&
+      normalizeEmail(user.email) === normalizeEmail(data.email),
+  );
+  if (duplicate) {
+    toast("An account with that email already exists.");
+    return;
+  }
+  const existing = state.users[index];
+  state.users[index] = {
+    ...existing,
+    name: data.name,
+    email: data.email,
+    role: data.role === "admin" ? "admin" : "member",
+    accountStatus: data.accountStatus === "Suspended" ? "Suspended" : "Active",
+  };
+  localStorage.setItem("dd-users", JSON.stringify(state.users));
+  if (
+    state.user === existing ||
+    normalizeEmail(state.user?.email) === normalizeEmail(existing.email)
+  ) {
+    state.user = state.users[index];
+    localStorage.setItem("dd-session", JSON.stringify(state.user));
+  }
+  toast("User details saved.");
   render();
 }
 document.addEventListener("click", (e) => {
@@ -142,6 +195,10 @@ $("#login").addEventListener("submit", (e) => {
     toast("Those login details do not match an account.");
     return;
   }
+  if (user.accountStatus === "Suspended") {
+    toast("This account is suspended.");
+    return;
+  }
   $("#authModal").classList.add("hidden");
   enter(user);
   toast("Welcome back, " + user.name.split(" ")[0] + ".");
@@ -149,11 +206,18 @@ $("#login").addEventListener("submit", (e) => {
 $("#signup").addEventListener("submit", (e) => {
   e.preventDefault();
   const d = Object.fromEntries(new FormData(e.target));
-  if (state.users.some((u) => normalizeEmail(u.email) === normalizeEmail(d.email))) {
+  if (
+    state.users.some((u) => normalizeEmail(u.email) === normalizeEmail(d.email))
+  ) {
     toast("An account with that email already exists.");
     return;
   }
-  const user = { ...d, role: "member" };
+  const user = {
+    ...d,
+    role: "member",
+    accountStatus: "Active",
+    registrationDate: new Date().toISOString(),
+  };
   state.users.push(user);
   localStorage.setItem("dd-users", JSON.stringify(state.users));
   $("#authModal").classList.add("hidden");
@@ -168,9 +232,14 @@ $("#logoutButton").addEventListener("click", () => {
   toast("You are logged out.");
 });
 const old = JSON.parse(localStorage.getItem("dd-session") || "null");
-const savedUser = old && state.users.find(
-  (user) => user.email === old.email && user.password === old.password,
-);
+const savedUser =
+  old &&
+  state.users.find(
+    (user) =>
+      normalizeEmail(user.email) === normalizeEmail(old.email) &&
+      user.password === old.password &&
+      user.accountStatus !== "Suspended",
+  );
 if (savedUser) enter(savedUser);
 else localStorage.removeItem("dd-session");
 
@@ -195,7 +264,12 @@ function showAdminSetup() {
       toast("An account with that email already exists.");
       return;
     }
-    state.users.push({ ...data, role: "admin" });
+    state.users.push({
+      ...data,
+      role: "admin",
+      accountStatus: "Active",
+      registrationDate: new Date().toISOString(),
+    });
     localStorage.setItem("dd-users", JSON.stringify(state.users));
     localStorage.setItem("dd-admin-setup-complete", "true");
     dialog.remove();
