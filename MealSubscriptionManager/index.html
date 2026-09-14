@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyDish | Meal subscriptions made simple</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="toast" class="toast" role="status"></div>
+    <main id="landingView">
+      <nav class="nav shell">
+        <a class="brand" href="#">daily<span>dish</span></a>
+        <div class="nav-links">
+          <a href="#plans">Plans</a><a href="#how">How it works</a
+          ><button class="text-button" data-action="login">Log in</button
+          ><button class="button small" data-action="signup">
+            Get started
+          </button>
+        </div>
+      </nav>
+      <section class="hero shell">
+        <div class="hero-copy">
+          <p class="eyebrow">MEALS, ON YOUR SCHEDULE</p>
+          <h1>Good food.<br /><em>Sorted.</em></h1>
+          <p class="lede">
+            Chef-crafted, nutritionist-approved meals delivered when life gets
+            busy.
+          </p>
+          <div class="hero-actions">
+            <button class="button" data-action="signup">
+              Build your box <span>→</span></button
+            ><a href="#plans" class="link-arrow"
+              >Explore plans <span>↓</span></a
+            >
+          </div>
+          <div class="hero-proof">
+            <div class="avatars"><i>J</i><i>M</i><i>S</i></div>
+            <span><strong>4.9/5</strong> from 2,000+ happy eaters</span>
+          </div>
+        </div>
+        <div class="hero-image">
+          <img
+            src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=85"
+            alt="Colourful freshly prepared meal bowls"
+          />
+          <div class="delivery-note">
+            <b>Next delivery</b><span>Wednesday, 18 Sep</span><i>✓</i>
+          </div>
+        </div>
+      </section>
+      <section id="how" class="steps shell">
+        <p class="eyebrow">SIMPLE BY DESIGN</p>
+        <h2>Fresh choices, fewer decisions.</h2>
+        <div class="step-grid">
+          <article>
+            <b>01</b>
+            <h3>Pick a plan</h3>
+            <p>Choose meals for however you actually eat.</p>
+          </article>
+          <article>
+            <b>02</b>
+            <h3>Choose your dishes</h3>
+            <p>Switch things up each week, or let us decide.</p>
+          </article>
+          <article>
+            <b>03</b>
+            <h3>Heat, eat, enjoy</h3>
+            <p>Fresh at your door, ready in just minutes.</p>
+          </article>
+        </div>
+      </section>
+      <section id="plans" class="plans">
+        <div class="shell">
+          <p class="eyebrow">FLEXIBLE PLANS</p>
+          <h2>Made to fit your week.</h2>
+          <div class="plan-grid">
+            <article class="plan">
+              <p class="tag">MOST FLEXIBLE</p>
+              <h3>Everyday</h3>
+              <p class="plan-copy">An easy, delicious routine.</p>
+              <strong>From $9.90 <small>/ meal</small></strong>
+              <ul>
+                <li>3-5 meals per week</li>
+                <li>Pause or skip anytime</li>
+                <li>50+ rotating recipes</li>
+              </ul>
+              <button class="outline-button" data-action="signup">
+                Choose Everyday
+              </button>
+            </article>
+            <article class="plan featured">
+              <p class="tag">BEST VALUE</p>
+              <h3>Full week</h3>
+              <p class="plan-copy">Your week, handled.</p>
+              <strong>From $8.50 <small>/ meal</small></strong>
+              <ul>
+                <li>8-12 meals per week</li>
+                <li>Free delivery included</li>
+                <li>Priority menu access</li>
+              </ul>
+              <button class="button" data-action="signup">
+                Choose Full week
+              </button>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+    <main id="appView" class="app hidden">
+      <aside class="sidebar">
+        <a class="brand" href="#">daily<span>dish</span></a>
+        <nav>
+          <button class="side-link active" data-page="dashboard">
+            ⌂ <span>Overview</span></button
+          ><button class="side-link" data-page="menu">
+            ▦ <span>This week's menu</span></button
+          ><button class="side-link" data-page="deliveries">
+            ◫ <span>My deliveries</span></button
+          ><button class="side-link" data-page="account">
+            ◎ <span>Account</span>
+          </button>
+        </nav>
+        <div class="sidebar-bottom">
+          <button class="side-link admin-only" data-page="admin">
+            ♙ <span>Admin panel</span></button
+          ><button id="logoutButton" class="side-link">
+            ↪ <span>Log out</span>
+          </button>
+          <div class="user-chip">
+            <div id="avatar"></div>
+            <span id="userName"><small>Member</small></span>
+          </div>
+        </div>
+      </aside>
+      <section class="workspace">
+        <header>
+          <div>
+            <p id="appEyebrow" class="eyebrow">GOOD MORNING</p>
+            <h1 id="appTitle">Your week, deliciously planned.</h1>
+          </div>
+          <button class="bell" aria-label="Notifications">♢<i></i></button>
+        </header>
+        <div id="pageContent"></div>
+      </section>
+    </main>
+    <div id="authModal" class="modal hidden" aria-modal="true" role="dialog">
+      <div class="modal-card">
+        <button class="close" data-action="close">×</button
+        ><a class="brand" href="#">daily<span>dish</span></a>
+        <div id="loginForm">
+          <p class="eyebrow">WELCOME BACK</p>
+          <h2>Log in to your table.</h2>
+          <form id="login">
+            <label
+              >Email<input
+                name="email"
+                type="email"
+                autocomplete="email"
+                required /></label
+            ><label
+              >Password<input
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required /></label
+            ><button class="button" type="submit">Log in <span>→</span></button>
+          </form>
+          <p class="form-switch">
+            New to DailyDish?
+            <button data-action="signup">Create an account</button>
+          </p>
+        </div>
+        <div id="signupForm" class="hidden">
+          <p class="eyebrow">GET STARTED</p>
+          <h2>Your table awaits.</h2>
+          <form id="signup">
+            <label
+              >Full name<input
+                name="name"
+                placeholder="Your name"
+                required /></label
+            ><label
+              >Email<input
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required /></label
+            ><label
+              >Password<input
+                name="password"
+                type="password"
+                placeholder="At least 6 characters"
+                minlength="6"
+                required /></label
+            ><button class="button" type="submit">
+              Create account <span>→</span>
+            </button>
+          </form>
+          <p class="form-switch">
+            Already a member? <button data-action="login">Log in</button>
+          </p>
+        </div>
+      </div>
+    </div>
+    <link rel="stylesheet" href="overrides.css" />
+    <link rel="stylesheet" href="commerce.css" />
+    <link rel="stylesheet" href="addresses.css" />
+    <script src="app.js"></script>
+    <script src="overrides.js"></script>
+    <script src="commerce.js"></script>
+    <script src="addresses.js"></script>
+  </body>
+</html>

@@ -1,0 +1,98 @@
+.address-manager {
+  margin-top: 20px;
+}
+.address-manager h2 {
+  margin-top: 0;
+}
+.address-card {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 17px;
+  margin: 13px 0;
+  background: white;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.address-card.default {
+  border-color: var(--coral);
+}
+.address-card strong {
+  display: block;
+  font-size: 14px;
+}
+.address-card p {
+  margin: 4px 0;
+  color: var(--muted);
+}
+.address-card .status {
+  position: absolute;
+  right: 13px;
+  top: 13px;
+}
+.address-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 11px;
+}
+.address-actions button {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--coral);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+.address-actions button.secondary {
+  color: var(--ink);
+}
+.add-address {
+  margin-top: 8px;
+}
+.address-error {
+  min-height: 19px;
+  margin: 2px 0 12px;
+  color: #bf3a2b;
+  font-size: 12px;
+}
+.address-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 14px;
+}
+.address-form-grid .full {
+  grid-column: 1 / -1;
+}
+.address-choice {
+  width: 100%;
+  margin: 8px 0;
+  text-align: left;
+  padding: 13px;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--ink);
+  font: 13px "DM Sans";
+}
+.address-choice.selected {
+  border-color: var(--coral);
+}
+.address-choice strong {
+  display: block;
+}
+.address-choice small {
+  color: var(--muted);
+}
+.address-choice .status {
+  float: right;
+}
+@media (max-width: 760px) {
+  .address-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .address-form-grid .full {
+    grid-column: auto;
+  }
+}

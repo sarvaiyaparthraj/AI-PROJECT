@@ -1,0 +1,211 @@
+.commerce-nav {
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+.cart-count {
+  display: grid;
+  place-items: center;
+  min-width: 19px;
+  height: 19px;
+  margin-left: auto;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--coral);
+  color: white;
+  font-size: 10px;
+}
+.meal-actions {
+  display: flex;
+  gap: 7px;
+  padding: 0 11px 11px;
+}
+.meal-with-actions {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+  background: white;
+}
+.meal-with-actions .meal {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+}
+.meal-with-actions .meal-choice.selected {
+  border: 2px solid var(--coral);
+}
+.meal-actions button {
+  flex: 1;
+  padding: 8px 7px;
+  font-size: 11px;
+}
+.meal-actions .outline-button {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+.commerce-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 22px;
+}
+.cart-row {
+  display: grid;
+  grid-template-columns: 76px 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.cart-row img {
+  width: 76px;
+  height: 62px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+.cart-row b,
+.cart-row small {
+  display: block;
+}
+.cart-row small {
+  color: var(--muted);
+  margin-top: 4px;
+}
+.quantity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.quantity button {
+  border: 1px solid var(--line);
+  background: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.quantity span {
+  min-width: 12px;
+  text-align: center;
+}
+.remove-link {
+  border: 0;
+  background: transparent;
+  color: var(--coral);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+.summary-panel h3 {
+  font: 600 20px "Fraunces";
+  margin: 0 0 18px;
+}
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 8px 0;
+}
+.summary-total {
+  color: var(--ink);
+  border-top: 1px solid var(--line);
+  margin-top: 10px;
+  padding-top: 16px;
+  font-weight: 700;
+  font-size: 16px;
+}
+.checkout-button {
+  width: 100%;
+  margin-top: 18px;
+}
+.checkout-address {
+  margin: 10px 0 20px;
+  padding: 13px;
+  background: #f7f8f3;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.payment-option {
+  border: 1px solid var(--line);
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.payment-option input {
+  width: auto;
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+}
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+}
+.empty-state h2 {
+  font: 600 28px "Fraunces";
+  margin: 0 0 10px;
+}
+.empty-state p {
+  color: var(--muted);
+}
+.order-card {
+  border-bottom: 1px solid var(--line);
+  padding: 18px 0;
+}
+.order-card:last-child {
+  border: 0;
+}
+.order-card h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+.order-card p {
+  margin: 4px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.order-card .status {
+  float: right;
+}
+.order-status-select {
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: white;
+  font: 12px "DM Sans";
+}
+.confirmation-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  background: #eff9d9;
+  color: #568600;
+  border-radius: 50%;
+  font-size: 25px;
+  margin-bottom: 18px;
+}
+@media (max-width: 760px) {
+  .commerce-layout {
+    grid-template-columns: 1fr;
+  }
+  .cart-row {
+    grid-template-columns: 58px 1fr auto;
+    gap: 10px;
+  }
+  .cart-row img {
+    width: 58px;
+    height: 52px;
+  }
+  .cart-row > strong {
+    grid-column: 2;
+  }
+  .meal-actions {
+    flex-wrap: wrap;
+  }
+  .meal-actions button {
+    min-width: 105px;
+  }
+}
